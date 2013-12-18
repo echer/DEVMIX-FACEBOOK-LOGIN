@@ -15,7 +15,7 @@ import com.sromku.simple.fb.SimpleFacebook.OnLoginListener;
 
 @Fullscreen
 @NoTitle  
-@EActivity(R.layout.activity_login)
+@EActivity
 public class ActivityLogin extends FragmentActivity implements OnLoginListener{
 
 	public static final int RESULT_LOGIN_SUCESS = 1;
@@ -36,6 +36,12 @@ public class ActivityLogin extends FragmentActivity implements OnLoginListener{
 	
 	
 	public SplashFragment splashFragment;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_login);
+	}
 	
 	@Override
 	public void onBackPressed(){
