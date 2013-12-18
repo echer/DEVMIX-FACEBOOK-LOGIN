@@ -16,12 +16,8 @@
 
 package com.devmix.facebook.login;
 
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +29,10 @@ import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.FragmentArg;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.sromku.simple.fb.Permissions;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebook.OnLoginListener;
+import com.sromku.simple.fb.SimpleFacebookConfiguration;
 
 @EFragment
 public class SplashFragment extends Fragment {
@@ -47,14 +45,26 @@ public class SplashFragment extends Fragment {
 	public String appName;
 	@FragmentArg
 	public String applicationId;
+	@FragmentArg
+	public String nameSpace;
 	@ViewById
 	public ImageView splashIcon;
 	@ViewById
 	public TextView profileName;
 	@ViewById
 	public TextView splashAppName;
+	
 	private OnLoginListener onLoginListener;
+	
 	private SimpleFacebook mSimpleFacebook;
+	
+	private Permissions[] permissions = new Permissions[]
+			{
+			    Permissions.USER_PHOTOS,
+			    Permissions.EMAIL,
+			    Permissions.PUBLISH_ACTION
+			};
+	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.splash, container, false);
@@ -68,7 +78,21 @@ public class SplashFragment extends Fragment {
     	splashAppName.setText(appName);
     	
     	mSimpleFacebook = SimpleFacebook.getInstance(getActivity());
+    	SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
+	        .setAppId(applicationId)
+	        .setNamespace(nameSpace)
+	        .setPermissions(permissions)
+	        .build();
+    	SimpleFacebook.setConfiguration(configuration);
+    	
     	setUIState();
+    }
+    
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        mSimpleFacebook = SimpleFacebook.getInstance(getActivity());
     }
     
     /**
@@ -86,7 +110,7 @@ public class SplashFragment extends Fragment {
 	 * You are logged in
 	 */
 	private void loggedInUIState(){
-		onLoginListener.onLogin();
+		getOnLoginListener().onLogin();
 	}
 
 	/**
@@ -97,27 +121,15 @@ public class SplashFragment extends Fragment {
     
     @Click
     public void loginButton(){
-    	mSimpleFacebook.login(new OnLoginListener() {
-			@Override
-			public void onFail(String reason) {
-				onLoginListener.onFail(reason);
-			}
-			@Override
-			public void onException(Throwable throwable) {
-				onLoginListener.onException(throwable);
-			}
-			@Override
-			public void onThinking() {
-				onLoginListener.onThinking();
-			}
-			@Override
-			public void onNotAcceptingPermissions() {
-				onLoginListener.onNotAcceptingPermissions();
-			}
-			@Override
-			public void onLogin() {
-				onLoginListener.onLogin();
-			}
-		});
+    	mSimpleFacebook.login(getOnLoginListener());
     }
+
+	public OnLoginListener getOnLoginListener() {
+		return onLoginListener;
+	}
+
+	public void setOnLoginListener(OnLoginListener onLoginListener) {
+		this.onLoginListener = onLoginListener;
+	}
+
 }

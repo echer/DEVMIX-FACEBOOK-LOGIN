@@ -6,5 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_activity_principal">ActivityPrincipal</string>
+    <string name="permissao_negada">Permissão para o aplicativo negada</string>
+    
 
 </resources>
